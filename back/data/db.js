@@ -5,6 +5,6 @@ var servico = require('../models/servico');
 var usuario = require('../models/usuario');
 var horario = require('../models/horario');
 
-mongoose.connect('mongodb://USER:PW@ADRESS:PORT/DBNAME', { useCreateIndex: true, useNewUrlParser: true });
+mongoose.connect('mongodb+srv://admin:admin@cluster0-pcyqe.mongodb.net/test?retryWrites=true&w=majority', { useCreateIndex: true, useUnifiedTopology: true });
 
 module.exports = {Mongoose: mongoose};
