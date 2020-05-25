@@ -14,6 +14,11 @@ app.get("/", (req, res) => {
 });
 
 app.use("/servicos", servicosRouter);
+app.use("/clientes", servicosRouter);
+app.use("/horarios", servicosRouter);
+app.use("/usuarios", servicosRouter);
+app.use("/profissionais", servicosRouter);
+app.use("/login", servicosRouter);
 
 app.listen(3000, function () {
   console.log('Servidor rodando na porta ' + 3000);
