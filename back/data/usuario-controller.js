@@ -1,26 +1,26 @@
 var db = require('./db');
-var Servico = db.Mongoose.model('Servico');
+var Usuario = db.Mongoose.model('Usuario');
 const limit = 10;
 
 exports.get = function(req, res, next){
     const pagAtual = parseInt(req.query.pag || '1');
     let params = req.query.q || '';
     let skip = limit * (pagAtual - 1);
+    
     let query;
     if(params){
-        // query = { 'nome': { $regex: '.*' + queryParam + '.*' } };
         query = { 'nome': params };
     }
 
-    Servico.find(query).skip(skip).limit(limit + 1).sort('nome').select('id nome').exec(
-        (err, servicos) => {
+    Usuario.find(query).skip(skip).limit(limit + 1).sort('nome').select('id nome').exec(
+        (err, usuarios) => {
             if(err){
                 return res.json({sucess: false, msg: 'Ocorreu um erro ao buscar os serviços"'});
             }
 
             let hasNext = false;
-            if(servicos.length > limit){
-                servicos.pop();
+            if(usuarios.length > limit){
+                usuarios.pop();
                 hasNext = true;
             }
 
@@ -30,25 +30,26 @@ exports.get = function(req, res, next){
                 q: params
             }
 
-            res.json({sucess: true, 'servicos': servicos, 'pagina': pag});
+            res.json({sucess: true, 'usuarios': usuarios, 'pagina': pag});
         });
 }
 
 exports.getById = function (req, res, next){
     let id = req.params.id;
-    Servico.findOne({_id: id}).exec(
-        (err, servico) => {
+
+    Usuario.findOne({_id: id}).exec(
+        (err, usuario) => {
             if(err){
             return res.json({success: false, msg: 'Não foi possível encontrar o serviço!'});
         }
-        res.json({success: true, 'servico': servico});
+        res.json({success: true, 'usuario': usuario});
     });
 }
 
 exports.save = function (req, res){
     if(req.body._id){
-        Servico.findOneAndUpdate({_id: req.body._id}, req.body, {new: true},
-            (err,newServico) =>{
+        Usuario.findOneAndUpdate({_id: req.body._id}, req.body, {new: true},
+            (err,newUsuario) =>{
                 if(err){
                     let msg = '';
                     for(var erro in err.errors){
@@ -57,16 +58,16 @@ exports.save = function (req, res){
                     }
                     return res.json({success:false , msg: msg})
                 }
-                res.json({success: true, msg: 'Salvo com sucesso!', servico: newServico});
+                res.json({success: true, msg: 'Salvo com sucesso!', usuario: newUsuario});
             })
     }else{
-        let servico = new Servico({
-            nome: req.body.nome,
-            descricao: req.body.descricao,
-            valor: req.body.valor
+        let usuario = new Usuario({
+            usuario: req.body.usuario,
+            profissional: req.body.profissional,
+            ativo: req.body.ativo
         });
 
-        servico.save(function(err, newServico){
+        usuario.save(function(err, newUsuario){
             if(err){
                 let msg = '';
                 for(let erro in err.errors){
@@ -75,14 +76,14 @@ exports.save = function (req, res){
                 }
                 return res.json({success: false, msg: msg});
             } else{
-                res.json({success: true, msg: 'Salvo com sucesso!', servico: newServico});
+                res.json({success: true, msg: 'Salvo com sucesso!', usuario: newUsuario});
             }
         });
     }
 }
 
 exports.delete = function (req, res) {
-    Servico.findOneAndDelete({ '_id': req.params.id }, function (err, servico) {
+    Usuario.findOneAndDelete({ '_id': req.params.id }, function (err, usuario) {
         if (err) {
             return res.json({ success: false, msg: 'Ocorreu um erro ao excluir!' });
         }
