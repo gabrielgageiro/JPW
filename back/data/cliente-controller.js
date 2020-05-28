@@ -1,21 +1,21 @@
 var db = require('./db');
 var Cliente = db.Mongoose.model('Cliente');
-const limit = 10;
 
 exports.get = function(req, res, next){
     const pagAtual = parseInt(req.query.pag || '1');
-    let params = req.query.q || '';
+    let params = req.query;
+    let limit = req.query.limit ? parseInt(req.query.limit) : 10;
     let skip = limit * (pagAtual - 1);
     
     let query;
     if(params){
-        // query = { 'nome': { $regex: '.*' + queryParam + '.*' } };
-        query = { 'nome': params };
+        query = { 'nome': params.nome };
     }
 
     Cliente.find(query).skip(skip).limit(limit + 1).sort('nome').select('id nome').exec(
         (err, clientes) => {
             if(err){
+                res.status(400);
                 return res.json({sucess: false, msg: 'Ocorreu um erro ao buscar os serviços"'});
             }
 
@@ -40,6 +40,8 @@ exports.getById = function (req, res, next){
     Cliente.findOne({_id: id}).exec(
         (err, cliente) => {
             if(err){
+                res.status(400);
+                
             return res.json({success: false, msg: 'Não foi possível encontrar o serviço!'});
         }
         res.json({success: true, 'cliente': cliente});
@@ -56,6 +58,8 @@ exports.save = function (req, res){
                         msg = err.errors[erro].message;
                         break;
                     }
+                    res.status(400);
+                    
                     return res.json({success:false , msg: msg})
                 }
                 res.json({success: true, msg: 'Salvo com sucesso!', cliente: newCliente});
@@ -74,6 +78,8 @@ exports.save = function (req, res){
                     msg = err.errors[erro].message;
                     break;
                 }
+                res.status(400);
+                
                 return res.json({success: false, msg: msg});
             } else{
                 res.json({success: true, msg: 'Salvo com sucesso!', cliente: newCliente});
@@ -85,6 +91,8 @@ exports.save = function (req, res){
 exports.delete = function (req, res) {
     Cliente.findOneAndDelete({ '_id': req.params.id }, function (err, cliente) {
         if (err) {
+            res.status(400);
+            
             return res.json({ success: false, msg: 'Ocorreu um erro ao excluir!' });
         }
         
